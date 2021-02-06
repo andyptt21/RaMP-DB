@@ -19,9 +19,11 @@ Imports:
     highcharter,
     DBI,
     dplyr,
+    plyr,
+    rlist,
     DT,
     xtable,
     visNetwork,
     properties,
     stringi
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1

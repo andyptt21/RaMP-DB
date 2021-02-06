@@ -5,27 +5,46 @@
 \title{Do fisher test for only one pathway from search result
 clicked on highchart}
 \usage{
-runCombinedFisherTest(pathwaydf, total_metabolites = NULL,
-  total_genes = 20000, min_analyte = 2, conpass = NULL,
-  dbname = "ramp", username = "root", host = "localhost")
+runCombinedFisherTest(
+  pathwaydf,
+  backgrounddf = NULL,
+  total_metabolites = NULL,
+  total_genes = 20000,
+  analyte_type = "metabolites",
+  conpass = NULL,
+  min_analyte = 2,
+  holmadjust = TRUE,
+  dbname = "ramp",
+  username = "root",
+  host = "localhost",
+  socket = NULL
+)
 }
 \arguments{
 \item{pathwaydf}{a data frame resulting from getPathwayFromAnalyte}
+
+\item{backgrounddf}{optional dataframe resulting from getPathwayFromAnalyte run on all analytes detected in study. This will be used as the background for the Fisher's contingency table. If left NULL, all analytes in RaMP are used as background}
 
 \item{total_metabolites}{number of metabolites analyzed in the experiment (e.g. background) (default is 1000; set to 'NULL' to retrieve total number of metabolites that map to any pathway in RaMP). Assumption that analyte_type is "metabolite")}
 
 \item{total_genes}{number of genes analyzed in the experiment (e.g. background) (default is 20000, with assumption that analyte_type is "genes")}
 
+\item{analyte_type}{"metabolites" or "genes" (default is "metabolites")}
+
+\item{conpass}{password for database access (string)}
+
 \item{min_analyte}{if the number of analytes (gene or metabolite) in a pathway is
 < min_analyte, do not report}
 
-\item{conpass}{password for database access (string)}
+\item{holmadjust}{boolean indicating if holm-adjusted p values should be included in output}
 
 \item{dbname}{name of the mysql database (default is "ramp")}
 
 \item{username}{username for database access (default is "root")}
 
 \item{host}{host name for database access (default is "localhost")}
+
+\item{socket}{(optional) location of mysql.sock file}
 }
 \value{
 a list containing two entries: [[1]] fishresults, a dataframe containing pathways with Fisher's p values (raw and with FDR and Holm adjustment), number of user analytes in pathway, total number of analytes in pathway, and pathway source ID/database. [[2]] analyte_type, a string specifying the type of analyte input into the function ("genes", "metabolites", or "both")

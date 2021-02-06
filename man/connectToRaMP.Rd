@@ -4,8 +4,13 @@
 \alias{connectToRaMP}
 \title{Connect to RaMP database (requires mysql password when running locally)}
 \usage{
-connectToRaMP(dbname = "ramp", username = "root", conpass = NULL,
-  host = "localhost")
+connectToRaMP(
+  dbname = "ramp",
+  username = "root",
+  conpass = NULL,
+  host = "localhost",
+  socket = NULL
+)
 }
 \arguments{
 \item{dbname}{the name of the database (by default a string that is database name including all tables}
@@ -15,6 +20,8 @@ connectToRaMP(dbname = "ramp", username = "root", conpass = NULL,
 \item{conpass}{password for database (string)}
 
 \item{host}{a string that stand for host}
+
+\item{socket}{(optional) location of mysql.sock file}
 }
 \value{
 MySQL connection based on given dbname,username,password, and host

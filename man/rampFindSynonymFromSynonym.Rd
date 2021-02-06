@@ -7,9 +7,16 @@ This function is used to filter out some super common synonyms like glyceride
 Now, this function only format the user input, so the user vector, dataframe,
 and entire string separated by comma are working.}
 \usage{
-rampFindSynonymFromSynonym(synonym, full = FALSE, find_synonym = FALSE,
-  conpass = NULL, dbname = "ramp", username = "root",
-  host = "localhost")
+rampFindSynonymFromSynonym(
+  synonym,
+  full = FALSE,
+  find_synonym = FALSE,
+  conpass = NULL,
+  dbname = "ramp",
+  username = "root",
+  host = "localhost",
+  socket = NULL
+)
 }
 \arguments{
 \item{synonym}{name to search for}
@@ -26,6 +33,8 @@ rampFindSynonymFromSynonym(synonym, full = FALSE, find_synonym = FALSE,
 
 \item{host}{host name for database access (default is "localhost")
 as input (there are some common synonyms that will mess up whole searching)}
+
+\item{socket}{(optional) location of mysql.sock file}
 }
 \value{
 a data frame that contains synonym in the first column rampId in the second column

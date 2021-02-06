@@ -5,9 +5,16 @@
 \title{Function that search analytes (gene or compounds)  or a list of analytes and
 returns associated pathways}
 \usage{
-getPathwayFromAnalyte(analytes = NULL, find_synonym = FALSE,
-  conpass = NULL, host = "localhost", dbname = "ramp",
-  username = "root", NameOrIds = "ids")
+getPathwayFromAnalyte(
+  analytes = NULL,
+  find_synonym = FALSE,
+  conpass = NULL,
+  host = "localhost",
+  dbname = "ramp",
+  username = "root",
+  NameOrIds = "ids",
+  socket = NULL
+)
 }
 \arguments{
 \item{analytes}{a vector of analytes (genes or metabolites) that need to be searched}
@@ -23,6 +30,8 @@ getPathwayFromAnalyte(analytes = NULL, find_synonym = FALSE,
 \item{username}{username for database access (default is "root")}
 
 \item{NameOrIds}{whether input is "names" or "ids" (default is "ids")}
+
+\item{socket}{(optional) location of mysql.sock file}
 }
 \value{
 a list contains all metabolites as name and pathway inside.

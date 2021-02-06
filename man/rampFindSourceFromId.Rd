@@ -4,8 +4,15 @@
 \alias{rampFindSourceFromId}
 \title{Find all source from given list of RaMP Ids}
 \usage{
-rampFindSourceFromId(rampId = NULL, full = TRUE, conpass = NULL,
-  dbname = "ramp", username = "root", host = "localhost")
+rampFindSourceFromId(
+  rampId = NULL,
+  full = TRUE,
+  conpass = NULL,
+  dbname = "ramp",
+  username = "root",
+  host = "localhost",
+  socket = NULL
+)
 }
 \arguments{
 \item{rampId}{could be a data frame return by rampFindSynonymFromSynonym
@@ -21,6 +28,8 @@ rampId}
 \item{username}{username for database access (default is "root")}
 
 \item{host}{host name for database access (default is "localhost")}
+
+\item{socket}{(optional) location of mysql.sock file}
 }
 \value{
 a data frame that has all source Id in the column or the source table that has metaoblites entry

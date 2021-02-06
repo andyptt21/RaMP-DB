@@ -10,10 +10,11 @@
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
 #' as input (there are some common synonyms that will mess up whole searching)
+#' @param socket (optional) location of mysql.sock file
 #' @return a data frame that contains synonym in the first column rampId in the second column
 rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
 	find_synonym = FALSE,conpass=NULL,dbname="ramp",username="root",
-	host = "localhost"){
+	host = "localhost", socket=NULL){
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
   }
@@ -45,7 +46,8 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
         dbname = dbname,
-        host = host)
+        host = host,
+        unix.socket=socket)
 
     df1 <- DBI::dbGetQuery(con,query)
     DBI::dbDisconnect(con)
@@ -71,7 +73,8 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
 	      dbname = dbname,
-        host = host)
+        host = host,
+        unix.socket=socket)
   df2 <- DBI::dbGetQuery(con,query)
   DBI::dbDisconnect(con)
   df2 <- merge(df1,df2)
@@ -89,11 +92,12 @@ rampFindSynonymFromSynonym <- function(synonym,full = FALSE,
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
 #' @param full return whole searching result or not (TRUE/FALSE)
 #' @return a data frame that has all source Id in the column or the source table that has metaoblites entry
 rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
 	conpass=NULL,dbname="ramp",username="root",
-	host = "localhost"){
+	host = "localhost", socket=NULL){
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
   }
@@ -122,7 +126,7 @@ rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
         dbname = dbname,
-        host = host)
+        host = host,unix.socket=socket)
   df <- DBI::dbGetQuery(con,query)
   DBI::dbDisconnect(con)
   if(full){
@@ -140,9 +144,10 @@ rampFindSourceFromId <- function(rampId=NULL,full = TRUE,
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
 #' @return a list contains all metabolits as name and pathway inside.
 rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
-	conpass=NULL,dbname="ramp",username="root",host = "localhost"){
+	conpass=NULL,dbname="ramp",username="root",host = "localhost",socket=NULL){
   # progress<- shiny::Progress$new()
   # progress$set(message = "Querying databases ...",value = 0)
   now <- proc.time()
@@ -163,7 +168,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
         dbname = dbname,
-        host = host)
+        host = host, unix.socket=socket)
 
   df1<- DBI::dbGetQuery(con,query1)
   DBI::dbDisconnect(con)
@@ -177,7 +182,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
         dbname = dbname,
-        host = host)
+        host = host, unix.socket=socket)
   df2 <- DBI::dbGetQuery(con,query2)
   DBI::dbDisconnect(con)
   #return(df2)
@@ -190,7 +195,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
         dbname = dbname,
-        host = host)
+        host = host, unix.socket=socket)
   df3 <- DBI::dbGetQuery(con,query3)
   DBI::dbDisconnect(con)
   #return(df3)
@@ -201,6 +206,7 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
   print(proc.time()- now)
   return(unique(mdf[,c(6,4,3,7)]))
 }
+
 #' Find rampId from given source ID
 #' The rampId can be plugged in other functions to continue query
 #' @param sourceId a data frame or string separated by comma or string
@@ -209,10 +215,12 @@ rampFastPathFromSource<- function(sourceid,find_synonym = FALSE,
 #' @param dbname name of the mysql database (default is "ramp")
 #' @param username username for database access (default is "root")
 #' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
 #' @return data.frame that has sourceId and rampId and source as columns
 rampFindSourceRampId <- function(sourceId, conpass=NULL,
 	dbname="ramp",username="root",
-	host = "localhost"){
+	host = "localhost",
+        socket=NULL){
   if(is.null(conpass)) {
         stop("Please define the password for the mysql connection")
   }
@@ -238,9 +246,134 @@ rampFindSourceRampId <- function(sourceId, conpass=NULL,
   con <- DBI::dbConnect(RMySQL::MySQL(), user = username,
         password = conpass,
         dbname = dbname,
-        host = host)
+        host = host,
+        unix.socket = socket)
   query <- paste0("select sourceId,IDtype as analytesource, rampId from source where sourceId in (",list_metabolite,");")
   df <- DBI::dbGetQuery(con,query)
   DBI::dbDisconnect(con)
   return(df)
 }
+
+#' Find rampId from given common name vector
+#' The rampId can be plugged in other functions to continue query
+#' @param common_names a vector of metabolite common name strings
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
+#' @param conpass password for database access (string)
+#' @param socket (optional) location of mysql.sock file
+#' @return data.frame that has rampId as column
+common_to_ramp<-function(common_names, conpass=NULL,
+	dbname="ramp",username="root",
+	host = "localhost",
+        socket=NULL){
+    query="select * from source"
+    con <- DBI::dbConnect(RMySQL::MySQL(),
+                          user=username, password=conpass,
+                          dbname=dbname, host=host,
+                          unix.socket = socket)
+    source_table <- DBI::dbGetQuery(con,query)
+    DBI::dbDisconnect(con)
+
+    common_names<-data.frame(commonName=common_names)
+    source_ids<- common_names %>%
+        dplyr::left_join(source_table,by="commonName") %>%
+        dplyr::distinct("rampId") %>%
+        dplyr::select("rampId")
+    return(source_ids)
+}
+
+#' Find rampId from given common name vector
+#' @param source_ids a vector of metabolite common name strings
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
+#' @param conpass password for database access (string)
+#' @return data.frame that has rampId as column
+source_to_common<-function(source_ids, conpass=NULL,
+	dbname="ramp",username="root",
+	host = "localhost",
+        socket=NULL){
+    query="select * from source"
+    con <- DBI::dbConnect(RMySQL::MySQL(),
+                          user=username, password=conpass,
+                          dbname=dbname, host=host,
+                          unix.socket = socket)
+    source_table <- DBI::dbGetQuery(con,query)
+    DBI::dbDisconnect(con)
+    
+    source_ids<-data.frame(sourceId=source_ids)
+    common_names<- source_ids %>%
+        dplyr::left_join(source_table,by="sourceId") %>%
+        dplyr::distinct("commonName") %>%
+        dplyr::select("commonName")
+    return(common_names)
+}
+
+#' Convert pathway source ids to common name
+#' @param pathways a vector of pathway source ids
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
+#' @param socket (optional) location of mysql.sock file
+#' @param conpass password for database access (string)
+#' @return vector of pathway names
+pathway_source_to_common<-function(pathways, conpass=NULL,
+	dbname="ramp",username="root",
+	host = "localhost",
+        socket=NULL){
+    query="select * from pathway"
+    con <- DBI::dbConnect(RMySQL::MySQL(),
+                          user=username, password=conpass,
+                          dbname=dbname, host=host,
+                          unix.socket = socket)
+    source_table <- DBI::dbGetQuery(con,query)
+    DBI::dbDisconnect(con)
+    
+    pathways<-data.frame(sourceId=pathways)
+    common_names<- pathways %>%
+        dplyr::left_join(source_table,by="sourceId") %>%
+        dplyr::select("pathwayName") %>%
+        as.matrix() %>% as.vector()
+    return(common_names)
+}
+
+#' Convert pathway ramp ids to source ids
+#' @param pathways a vector of pathway source ids
+#' @param dbname name of the mysql database (default is "ramp")
+#' @param username username for database access (default is "root")
+#' @param host host name for database access (default is "localhost")
+#' @param conpass password for database access (string)
+#' @param socket (optional) location of mysql.sock file
+#' @return vector of pathway source ids
+pathway_ramp_to_source<-function(pathways, conpass=NULL,
+	dbname="ramp",username="root",
+	host = "localhost",
+        socket=NULL){
+    query="select * from pathway"
+    con <- DBI::dbConnect(RMySQL::MySQL(),
+                          user=username, password=conpass,
+                          dbname=dbname, host=host,
+                          unix.socket = socket)
+    source_table <- DBI::dbGetQuery(con,query)
+    DBI::dbDisconnect(con)
+
+    pathways<-data.frame(pathwayRampId=pathways)
+    key<- pathways %>%
+        dplyr::left_join(source_table,by="pathwayRampId")
+    source_ids=c()
+    for(i in key$pathwayRampId){
+        id<-key %>% dplyr::filter("pathwayRampId"==i) %>%
+            dplyr::slice(1) %>%
+            dplyr::select("sourceId") %>%
+            as.matrix() %>%
+            as.vector()
+        source_ids = c(source_ids,id)
+    }
+    ##source_ids<-data.frame(sourceId=source_ids)
+    return(source_ids)
+}
+
+
+

@@ -4,8 +4,15 @@
 \alias{rampFastPathFromSource}
 \title{Fast search given a list of metabolites source Id}
 \usage{
-rampFastPathFromSource(sourceid, find_synonym = FALSE, conpass = NULL,
-  dbname = "ramp", username = "root", host = "localhost")
+rampFastPathFromSource(
+  sourceid,
+  find_synonym = FALSE,
+  conpass = NULL,
+  dbname = "ramp",
+  username = "root",
+  host = "localhost",
+  socket = NULL
+)
 }
 \arguments{
 \item{sourceid}{a vector of synonym that need to be searched}
@@ -19,6 +26,8 @@ rampFastPathFromSource(sourceid, find_synonym = FALSE, conpass = NULL,
 \item{username}{username for database access (default is "root")}
 
 \item{host}{host name for database access (default is "localhost")}
+
+\item{socket}{(optional) location of mysql.sock file}
 }
 \value{
 a list contains all metabolits as name and pathway inside.
