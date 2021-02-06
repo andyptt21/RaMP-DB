@@ -483,7 +483,7 @@ getPathwayFromAnalyte<- function (
     if (NameOrIds == "names") {
         synonym <- rampFindSynonymFromSynonym(synonym = analytes, 
             find_synonym = find_synonym, conpass = conpass, host = host, 
-            dbname = dbname, username = username)
+            dbname = dbname, username = username, socket = socket)
         colnames(synonym)[1] = "commonName"
         synonym$commonName <- tolower(synonym$commonName)
         if (nrow(synonym) == 0) {
@@ -496,7 +496,7 @@ getPathwayFromAnalyte<- function (
     else if (NameOrIds == "ids") {
         sourceramp <- rampFindSourceRampId(sourceId = analytes, 
             conpass = conpass, host = host, dbname = dbname, 
-            username = username)
+            username = username, socket=socket)
         if (nrow(sourceramp) == 0) {
             stop("Make sure you are actually inputting ids and not names (you have NameOrIds set to 'ids'. If you are, then no ids were matched in the RaMP database.")
         }
@@ -795,6 +795,7 @@ FilterFishersResults<-function(fishers_df,p_holmadj_cutoff=NULL,
 #' @param metaboliteClusters Optional output of cluster_metabolites
 #' @param ncpus optional parameter indicating number of cpus available for parallel computation
 #' @return a dataframe with columns containing pathway ID, fisher's p value, user analytes in pathway, total analytes in pathway, and Westfall-Young permuted p-values
+#' @export
 WY_pathway_adjustment<-
     function(pathwaydf,backgrounddf,
              total_metabolites=NULL,total_genes=20000,
@@ -934,7 +935,7 @@ WY_pathway_adjustment<-
             fake_metabolites_of_interest<-sample(background_metabolites,
                                                  length(metabolites_of_interest))
             pathwaydf_fake<-backgrounddf %>%
-                dplyr::filter("rampId" %in% fake_metabolites_of_interest)
+                dplyr::filter(backgrounddf$rampId %in% fake_metabolites_of_interest)
             fake_result<-fast_fishers(cids_bg,pathwaydf_fake,backgrounddf)
             if(x %% 10 == 0){
                 print(paste0(x, " out of ", repetitions, " pathway sets simulated"))
