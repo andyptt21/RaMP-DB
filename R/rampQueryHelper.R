@@ -364,7 +364,7 @@ pathway_ramp_to_source<-function(pathways, conpass=NULL,
         dplyr::left_join(source_table,by="pathwayRampId")
     source_ids=c()
     for(i in key$pathwayRampId){
-        id<-key %>% dplyr::filter("pathwayRampId"==i) %>%
+        id<-key %>% dplyr::filter(key$pathwayRampId==i) %>%
             dplyr::slice(1) %>%
             dplyr::select("sourceId") %>%
             as.matrix() %>%
