@@ -855,14 +855,14 @@ WY_pathway_adjustment<-
         
         DBI::dbDisconnect(con)
         
-        fast_fishers<-function(cids_bg,pathwaydf,backgrounddf){
+        fast_fishers<-function(pid,cids_bg,pathwaydf,backgrounddf){
             ## Loop through each user pathway, build the contingency table, and calculate Fisher's Exact
         ## test p-value
             pval=totinpath=userinpath=pidused=c()
             for (i in pid) {
                 ##curpathcids <- unique(cids[which(cids[,"pathwayRampId"]==i),"rampId"])
-                curpathcids<-unique(intersect(cids_bg[which(cids_bg[,"pathwayRampId"]==i),"rampId"],
-                                              pathwaydf$rampId))
+                curpathcids<-unique(cids_bg[which(cids_bg[,"pathwayRampId"]==i),
+                                                      "rampId"])
                 if(analyte_type=="metabolites") {
                     tot_in_pathway <- length(grep("RAMP_C",curpathcids))
                 }else {
@@ -902,7 +902,7 @@ WY_pathway_adjustment<-
             return(out)        
         }
         if(is.null(metaboliteClusters)){
-            true_results<-fast_fishers(cids_bg,pathwaydf,backgrounddf) %>% dplyr::arrange("Pval")
+            true_results<-fast_fishers(pid, cids_bg,pathwaydf,backgrounddf) %>% dplyr::arrange("Pval")
             true_pathway_count<-nrow(true_results)
         }else{
             ## So cluster numbering is consistent between network and pathway visual
@@ -922,7 +922,7 @@ WY_pathway_adjustment<-
                     dplyr::select("rampId")
                 pathwaydf<-pathwaydf %>%
                     dplyr::filter("rampId" %in% as.matrix(as.vector(metabolites)))
-                true_results<-fast_fishers(cids_bg,pathwaydf,backgrounddf) %>% dplyr::arrange("Pval")
+                true_results<-fast_fishers(pid,cids_bg,pathwaydf,backgrounddf) %>% dplyr::arrange("Pval")
                 return(true_results)
             })
             true_pathway_count<-max(sapply(true_results,nrow))
@@ -936,7 +936,8 @@ WY_pathway_adjustment<-
                                                  length(metabolites_of_interest))
             pathwaydf_fake<-backgrounddf %>%
                 dplyr::filter(backgrounddf$rampId %in% fake_metabolites_of_interest)
-            fake_result<-fast_fishers(cids_bg,pathwaydf_fake,backgrounddf)
+            pid_fake <- unique(pathwaydf_fake$pathwayRampId)
+            fake_result<-fast_fishers(pid_fake,cids_bg,pathwaydf_fake,backgrounddf)
             if(x %% 10 == 0){
                 print(paste0(x, " out of ", repetitions, " pathway sets simulated"))
             }
