@@ -277,8 +277,8 @@ common_to_ramp<-function(common_names, conpass=NULL,
 
     common_names<-data.frame(commonName=common_names)
     source_ids<- common_names %>%
-        dplyr::left_join(source_table,by="commonName") %>%
-        dplyr::distinct("rampId") %>%
+        dplyr::left_join(source_table,by="commonName")
+    source_ids<- source_ids[!duplicated(source_ids$rampId),] %>%
         dplyr::select("rampId")
     return(source_ids)
 }
@@ -305,8 +305,8 @@ source_to_common<-function(source_ids, conpass=NULL,
     
     source_ids<-data.frame(sourceId=source_ids)
     common_names<- source_ids %>%
-        dplyr::left_join(source_table,by="sourceId") %>%
-        dplyr::distinct("commonName") %>%
+        dplyr::left_join(source_table,by="sourceId")
+     common_names <- common_names[!duplicated(common_names$rampId),] %>%
         dplyr::select("commonName")
     return(common_names)
 }
