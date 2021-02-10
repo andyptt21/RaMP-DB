@@ -52,9 +52,21 @@ runFisherTest <- function(pathwaydf,backgrounddf=NULL,
     allids <- allids[!duplicated(allids),]
     
     if((analyte_type == "metabolites") && (is.null(total_metabolites))) {
-	wiki_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="wiki"),"rampId"])]))
-	react_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="reactome"),"rampId"])]))
-	kegg_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="kegg"),"rampId"])]))
+        ## JCB replaced these lines. Reducing to a source, extracting compound indices, then applying to the full set of rampIds
+        ## caused an error in the tally of analytes
+        
+	## wiki_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="wiki"),"rampId"])]))
+	## react_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="reactome"),"rampId"])]))
+	## kegg_totanalytes <- length(unique(allids$rampId[grep("RAMP_C",allids[which(allids$pathwaySource=="kegg"),"rampId"])]))
+
+        sourceIds <- allids[which(allids$pathwaySource=="wiki"),"rampId"]
+        wiki_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
+
+        sourceIds <- allids[which(allids$pathwaySource=="reactome"),"rampId"]
+        react_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
+    
+        sourceIds <- allids[which(allids$pathwaySource=="kegg"),"rampId"]
+        kegg_totanalytes <- length(unique(sourceIds[grep("RAMP_C",sourceIds)]))
     }
     if(analyte_type=="genes") {
 	wiki_totanalytes <- react_totanalytes <- kegg_totanalytes <- total_genes
