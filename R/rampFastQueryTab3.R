@@ -810,6 +810,7 @@ FilterFishersResults<-function(fishers_df,p_holmadj_cutoff=NULL,
 #' @export
 WY_pathway_adjustment<-
     function(pathwaydf,backgrounddf,
+             ## similarity_cutoff,
              total_metabolites=NULL,total_genes=20000,
              analyte_type="metabolites",conpass=NULL,
              dbname="ramp",username="root",
@@ -914,12 +915,13 @@ WY_pathway_adjustment<-
             return(out)        
         }
         if(is.null(metaboliteClusters)){
-            true_results<-fast_fishers(pid, cids_bg,pathwaydf,backgrounddf) %>% dplyr::arrange("Pval")
+            true_results<-fast_fishers(pid, cids_bg,pathwaydf,backgrounddf)
+            true_results<-true_results %>% dplyr::arrange(true_results$Pval)
             true_pathway_count<-nrow(true_results)
         }else{
             ## So cluster numbering is consistent between network and pathway visual
             metaboliteClusters <-metaboliteClusters %>%
-                dplyr::arrange("cluster")
+                dplyr::arrange(metaboliteClusters$cluster)
             
             true_results<-lapply(unique(metaboliteClusters$cluster),function(x){
                 metabolites<-metaboliteClusters %>%
@@ -934,7 +936,7 @@ WY_pathway_adjustment<-
                     dplyr::select("rampId")
                 pathwaydf<-pathwaydf %>%
                     dplyr::filter("rampId" %in% as.matrix(as.vector(metabolites)))
-                true_results<-fast_fishers(pid,cids_bg,pathwaydf,backgrounddf) %>% dplyr::arrange("Pval")
+                true_results<-fast_fishers(pid,cids_bg,pathwaydf,backgrounddf) %>% dplyr::arrange(true_results$Pval)
                 return(true_results)
             })
             true_pathway_count<-max(sapply(true_results,nrow))
@@ -946,6 +948,19 @@ WY_pathway_adjustment<-
         empirical_pval_matrix<-parallel::mclapply(1:repetitions,function(x){
             fake_metabolites_of_interest<-sample(background_metabolites,
                                                  length(metabolites_of_interest))
+
+            ## fake_metabolites_distances<-measure_metabolite_distance(fake_metabolites_of_interest,
+            ##                                                        conpass=conpass,
+            ##                                                        socket=socket)
+            ## fake_metabolites_proximal<-extract_proximal_metabolites(fake_metabolites_of_interest,
+            ##                                                         fake_metabolites_distances,
+            ##                                                         cutoff=similarity_cutoff,
+            ##                                                         conpass=conpass,
+            ##                                                         socket=socket)
+            ## fake_metabolites_of_interest=c(fake_metabolites_of_interest,
+            ##                                fake_metabolites_proximal)   
+            
+            
             pathwaydf_fake<-backgrounddf %>%
                 dplyr::filter(backgrounddf$rampId %in% fake_metabolites_of_interest)
             pid_fake <- unique(pathwaydf_fake$pathwayRampId)
